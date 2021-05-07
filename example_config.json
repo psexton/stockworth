@@ -1,0 +1,15 @@
+{
+  "symbol": "GME",
+  "rsus": [
+    {"qty": 500.5, "vest_date": "2021-09-10"},
+    {"qty": 300.2, "vest_date": "2021-11-10"}
+  ],
+  "options": [
+    {"qty": 6000, "price": 5.01, "vest_date": "2022-02-03"},
+    {"qty": 7000, "price": 6.02, "vest_date": "2023-03-04"}
+  ],
+  "thresholds": [
+    50000,
+    25000
+  ]
+}
