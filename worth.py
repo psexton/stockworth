@@ -7,6 +7,7 @@ from alpha_vantage.timeseries import TimeSeries
 from datetime import date
 
 from equity import Equity
+from equity_group import EquityGroup
 
 
 def main():
@@ -23,18 +24,15 @@ def main():
     all_equity = convert_to_equity(latest_price, config)
 
     # compute total value
-    total_value = sum(e.value for e in all_equity)
+    total_value = all_equity.total_value()
     print(f"total_value={locale.currency(total_value)}")
 
     # split out unvested equity from vested
-    vested_value = sum(e.value for e in all_equity if e.is_vested_by(date.today()))
+    vested_value = all_equity.vested_value()
     print(f"vested_value={locale.currency(vested_value)}")
 
-    # sort unvested values by date
-    # for each date, subtract amount that vests on that date
-    # for each threshold, check if remaining amount is less
-    # iterate until we run out of thresholds or we run out of equity
     # produce threshold/date pairs
+    threshold_pairs = compute_thresholds(threshold_values=config["thresholds"], equity=all_equity)
 
     # for each threshold date, compute duration from now
 
@@ -74,7 +72,11 @@ def convert_to_equity(latest_price, config):
     ))
     # print(f"options={options}")
 
-    return rsus + options
+    return EquityGroup(rsus + options)
+
+
+def compute_thresholds(threshold_values, equity):
+    return []
 
 
 if __name__ == "__main__":
