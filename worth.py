@@ -8,7 +8,7 @@ from alpha_vantage.timeseries import TimeSeries
 def main():
     # read in config file
     with open('config.json', 'r') as config_file:
-        config=json.loads(config_file.read())
+        config = json.loads(config_file.read())
 
     # look up current price
     ticker_symbol = config["symbol"]
@@ -18,7 +18,6 @@ def main():
     # convert RSUs into date/value pairs
     # convert options into date/value pairs
     # compute total value
-    
 
     # split out unvested equity from vested
 
