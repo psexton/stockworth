@@ -4,6 +4,7 @@ import json
 import locale
 import os
 from alpha_vantage.timeseries import TimeSeries
+from datetime import date
 
 from equity import Equity
 
@@ -26,6 +27,8 @@ def main():
     print(f"total_value={locale.currency(total_value)}")
 
     # split out unvested equity from vested
+    vested_value = sum(e.value for e in all_equity if e.is_vested_by(date.today()))
+    print(f"vested_value={locale.currency(vested_value)}")
 
     # sort unvested values by date
     # for each date, subtract amount that vests on that date
