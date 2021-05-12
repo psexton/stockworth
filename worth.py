@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 import json
+import locale
 import os
 from alpha_vantage.timeseries import TimeSeries
+
+from equity import Equity
 
 
 def main():
@@ -15,9 +18,12 @@ def main():
     latest_price = get_latest_price(ticker_symbol)
     print(f"stock={ticker_symbol}, latest_price={latest_price:,.2f}")
 
-    # convert RSUs into date/value pairs
-    # convert options into date/value pairs
+    # convert RSUs and options into date/value pairs
+    all_equity = convert_to_equity(latest_price, config)
+
     # compute total value
+    total_value = sum(e.value for e in all_equity)
+    print(f"total_value={locale.currency(total_value)}")
 
     # split out unvested equity from vested
 
@@ -41,5 +47,33 @@ def get_latest_price(ticker_symbol):
     return latest_price
 
 
+def convert_to_equity(latest_price, config):
+    # convert rsus into date/value pairs
+    rsus = list(map(
+        lambda rsu: Equity.from_rsu(
+            current_price=latest_price,
+            quantity=rsu["qty"],
+            vest_date=rsu["vest_date"]
+        ),
+        config["rsus"]
+    ))
+    # print(f"rsus={rsus}")
+
+    # convert options into date/value pairs
+    options = list(map(
+        lambda option: Equity.from_option(
+            current_price=latest_price,
+            quantity=option["qty"],
+            vest_date=option["vest_date"],
+            strike_price=option["price"]
+        ),
+        config["options"]
+    ))
+    # print(f"options={options}")
+
+    return rsus + options
+
+
 if __name__ == "__main__":
+    locale.setlocale(locale.LC_ALL, '')
     main()

@@ -1,7 +1,12 @@
+import locale
+
 class Equity:
     def __init__(self, date, value):
         self.date = date
         self.value = value
+
+    def __repr__(self):
+        return f"({self.date} -> {locale.currency(self.value)})"
 
     @staticmethod
     def from_rsu(current_price, quantity, vest_date):
