@@ -4,10 +4,10 @@ import json
 import locale
 import os
 from alpha_vantage.timeseries import TimeSeries
-from datetime import date
 
 from equity import Equity
 from equity_group import EquityGroup
+from threshold import Threshold
 
 
 def main():
@@ -32,9 +32,8 @@ def main():
     print(f"vested_value={locale.currency(vested_value)}")
 
     # produce threshold/date pairs
-    threshold_pairs = compute_thresholds(threshold_values=config["thresholds"], equity=all_equity)
-
-    # for each threshold date, compute duration from now
+    thresholds = compute_thresholds(threshold_values=config["thresholds"], equity=all_equity)
+    
 
     # pretty print
 
@@ -76,7 +75,9 @@ def convert_to_equity(latest_price, config):
 
 
 def compute_thresholds(threshold_values, equity):
-    return []
+    thresholds = list(map(lambda threshold: Threshold(threshold, equity), threshold_values))
+    # print(f"thresholds={thresholds}")
+    return thresholds
 
 
 if __name__ == "__main__":
