@@ -33,7 +33,7 @@ def main():
 
     # produce threshold/date pairs
     thresholds = compute_thresholds(threshold_values=config["thresholds"], equity=all_equity)
-    
+    print(f"thresholds={thresholds}")
 
     # pretty print
 
@@ -76,7 +76,6 @@ def convert_to_equity(latest_price, config):
 
 def compute_thresholds(threshold_values, equity):
     thresholds = list(map(lambda threshold: Threshold(threshold, equity), threshold_values))
-    # print(f"thresholds={thresholds}")
     return thresholds
 
 
