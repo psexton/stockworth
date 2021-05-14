@@ -18,7 +18,7 @@ def main():
 
     # look up current price
     ticker_symbol = config["symbol"]
-    latest_price = get_latest_price(ticker_symbol)
+    latest_price = get_latest_price(ticker_symbol, config["apikey"])
     # print(f"stock={ticker_symbol}, latest_price={latest_price:,.2f}")
 
     # convert RSUs and options into date/value pairs
@@ -55,13 +55,23 @@ def read_config():
     args = parser.parse_args()
 
     with open(args.file, 'r') as config_file:
-        return json.loads(config_file.read())
+        config = json.loads(config_file.read())
+
+    # if config did not contain apikey, try to read it from env var
+    if not "apikey" in config:
+        env_api_key = os.getenv("ALPHAVANTAGE_API_KEY")
+        if env_api_key is None:
+            raise Exception("Could not find api key")
+        else:
+            config["apikey"] = env_api_key
+
+    return config
 
 
 # Use the "quote endpoint" from alphavantage
 # <https://www.alphavantage.co/documentation/#latestprice>
-def get_latest_price(ticker_symbol):
-    ts = TimeSeries(key=os.environ["ALPHAVANTAGE_API_KEY"])
+def get_latest_price(ticker_symbol, api_key):
+    ts = TimeSeries(key=api_key)
     data, meta_data = ts.get_quote_endpoint(ticker_symbol)
     latest_price = float(data["05. price"])
     return latest_price
