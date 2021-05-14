@@ -20,7 +20,7 @@ You'll also need to provide a json config file containing the ticker symbol, you
 ## Running
 
 ```
-$ ./worth.py --file example_config.json
+$ ./stockworth.py --file example_config.json
 GME is trading at 164.50. Your total equity is worth $997,414. If you quit today, you will be walking away from $787,490.
 Only 0 years, 11 months, and 28 days until that's less than $500,000.
 Only 2 years, 0 months, and 29 days until that's less than $100,000.

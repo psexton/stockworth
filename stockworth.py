@@ -49,7 +49,7 @@ def main():
 
 def read_config():
     # read in config file name
-    parser = argparse.ArgumentParser(prog="worth.py")
+    parser = argparse.ArgumentParser(prog="stockworth.py")
     parser.add_argument("-f", "--file", default="config.json",
                         help="The json file to read the config from (defaults to config.json).")
     args = parser.parse_args()
