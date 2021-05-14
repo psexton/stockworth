@@ -39,8 +39,8 @@ def main():
 
     # pretty print
     message = f"{ticker_symbol} is trading at {latest_price:,.2f}. " \
-              f"Your total equity is worth {format_currency(total_value)}. " \
-              f"If you quit today, you will be walking away from {format_currency(unvested_value)}."
+              f"Your total equity is worth {format_currency(total_value)}." \
+              f"\nIf you quit today, you will be walking away from {format_currency(unvested_value)}."
     for threshold in thresholds:
         message += f"\nOnly {format_date_delta(threshold.date)} until that's less than {format_currency(threshold.amount)}."
     message += "\nHang in there!"
