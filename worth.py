@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import json
-import locale
 import os
 from alpha_vantage.timeseries import TimeSeries
 
@@ -18,25 +17,32 @@ def main():
     # look up current price
     ticker_symbol = config["symbol"]
     latest_price = get_latest_price(ticker_symbol)
-    print(f"stock={ticker_symbol}, latest_price={latest_price:,.2f}")
+    # print(f"stock={ticker_symbol}, latest_price={latest_price:,.2f}")
 
     # convert RSUs and options into date/value pairs
     all_equity = convert_to_equity(latest_price, config)
 
     # compute total value
     total_value = all_equity.total_value()
-    print(f"total_value={locale.currency(total_value)}")
+    # print(f"total_value={format_currency(total_value)}")
 
     # split out unvested equity from vested
     vested_value = all_equity.vested_value()
-    print(f"vested_value={locale.currency(vested_value)}")
+    unvested_value = total_value - vested_value
+    # print(f"vested_value={format_currency(vested_value)}")
 
     # produce threshold/date pairs
     thresholds = compute_thresholds(threshold_values=config["thresholds"], equity=all_equity)
-    print(f"thresholds={thresholds}")
+    # print(f"thresholds={thresholds}")
 
     # pretty print
-
+    message = f"{ticker_symbol} is trading at {latest_price:,.2f}. " \
+              f"Your total equity is worth {format_currency(total_value)}. " \
+              f"If you quit today, you will be walking away from {format_currency(unvested_value)}."
+    for threshold in thresholds:
+        message += f"\nTo lose less than {format_currency(threshold.amount)}, wait until {threshold.date}."
+    message += "\nHang in there!"
+    print(message)
 
 # Use the "quote endpoint" from alphavantage
 # <https://www.alphavantage.co/documentation/#latestprice>
@@ -79,6 +85,10 @@ def compute_thresholds(threshold_values, equity):
     return thresholds
 
 
+def format_currency(amount):
+    # prefix with $, separate at thousands with ',', no decimal places
+    return f"${amount:,.0f}"
+
+
 if __name__ == "__main__":
-    locale.setlocale(locale.LC_ALL, '')
     main()
