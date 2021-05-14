@@ -3,6 +3,8 @@
 import json
 import os
 from alpha_vantage.timeseries import TimeSeries
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 from equity import Equity
 from equity_group import EquityGroup
@@ -40,7 +42,7 @@ def main():
               f"Your total equity is worth {format_currency(total_value)}. " \
               f"If you quit today, you will be walking away from {format_currency(unvested_value)}."
     for threshold in thresholds:
-        message += f"\nTo lose less than {format_currency(threshold.amount)}, wait until {threshold.date}."
+        message += f"\nOnly {format_date_delta(threshold.date)} until that's less than {format_currency(threshold.amount)}."
     message += "\nHang in there!"
     print(message)
 
@@ -88,6 +90,12 @@ def compute_thresholds(threshold_values, equity):
 def format_currency(amount):
     # prefix with $, separate at thousands with ',', no decimal places
     return f"${amount:,.0f}"
+
+
+def format_date_delta(future_date):
+    start_date = date.today()
+    diff = relativedelta(future_date, start_date)
+    return f"{diff.years} years, {diff.months} months, and {diff.days} days"
 
 
 if __name__ == "__main__":
