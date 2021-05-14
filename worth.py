@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import json
 import os
 from alpha_vantage.timeseries import TimeSeries
@@ -13,8 +14,7 @@ from threshold import Threshold
 
 def main():
     # read in config file
-    with open('config.json', 'r') as config_file:
-        config = json.loads(config_file.read())
+    config = read_config()
 
     # look up current price
     ticker_symbol = config["symbol"]
@@ -45,6 +45,18 @@ def main():
         message += f"\nOnly {format_date_delta(threshold.date)} until that's less than {format_currency(threshold.amount)}."
     message += "\nHang in there!"
     print(message)
+
+
+def read_config():
+    # read in config file name
+    parser = argparse.ArgumentParser(prog="worth.py")
+    parser.add_argument("-f", "--file", default="config.json",
+                        help="The json file to read the config from (defaults to config.json).")
+    args = parser.parse_args()
+
+    with open(args.file, 'r') as config_file:
+        return json.loads(config_file.read())
+
 
 # Use the "quote endpoint" from alphavantage
 # <https://www.alphavantage.co/documentation/#latestprice>
