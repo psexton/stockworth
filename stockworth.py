@@ -28,6 +28,7 @@ from dateutil.relativedelta import relativedelta
 from equity import Equity
 from equity_group import EquityGroup
 from threshold import Threshold
+from vesting_schedule import VestingSchedule
 
 
 def main():
@@ -58,9 +59,12 @@ def main():
     # pretty print
     message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
               f"At that price, your total equity is worth {format_currency(total_value)}." \
-              f"\nIf you quit today, you will be walking away from {format_currency(unvested_value)}."
+              f"\nYour vesting schedule is"
+    for entry in compute_and_format_vesting_schedule(all_equity):
+        message += f"\n\t{entry}"
+    message += f"\nIf you quit today, you will be walking away from {format_currency(unvested_value)}."
     for threshold in thresholds:
-        message += f"\nOnly {format_date_delta(threshold.date)} until that's less than {format_currency(threshold.amount)}."
+        message += f"\n\tOnly {format_date_delta(threshold.date)} until that's less than {format_currency(threshold.amount)}."
     message += "\nHang in there!"
     print(message)
 
@@ -125,6 +129,19 @@ def convert_to_equity(latest_price, config):
 def compute_thresholds(threshold_values, equity):
     thresholds = list(map(lambda threshold: Threshold(threshold, equity), threshold_values))
     return thresholds
+
+
+def compute_and_format_vesting_schedule(all_equity):
+    # produce vesting schedule
+    schedule = VestingSchedule(all_equity)
+    # sort the dictionary,
+    # and replace the flag date with "Vested"
+    formatted_lines = []
+    for key, value in sorted(schedule.vesting_months.items()):
+        formatted_key = "Vested" if key == schedule.already_vested else key.strftime("%b %Y")
+        formatted_value = format_currency(value)
+        formatted_lines.append(f"{formatted_key}: {formatted_value}")
+    return formatted_lines
 
 
 def format_currency(amount):
