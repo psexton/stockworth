@@ -29,6 +29,12 @@ Only 2 years, 0 months, and 29 days until that's less than $100,000.
 Hang in there!
 ```
 
+## Testing
+
+```
+$ python -m unittest
+```
+
 ## License
 
 [GNU AGPLv3](https://choosealicense.com/licenses/agpl-3.0/)
