@@ -16,6 +16,8 @@ Stock prices are pulled from [Alpha Vantage](https://www.alphavantage.co/), usin
 
 You'll also need to provide a json config file containing the ticker symbol, your grant info, and your buckets for how much is okay to leave behind. An example can be found in [example_config.json](example_config.json).
 
+If you prefer, you can supply the apikey as a `"apikey":"XXXXXXXX"` object in your config file instead of as an env var.
+
 ## Running
 
 ```
