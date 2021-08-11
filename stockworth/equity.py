@@ -39,5 +39,5 @@ class Equity:
     def from_option(current_price, quantity, vest_date, strike_price):
         purchase_price = quantity * strike_price
         sale_price = current_price * quantity
-        value = sale_price - purchase_price
+        value = max(sale_price - purchase_price, 0.0)  # options have a minimum value of worthless
         return Equity(vest_date, value)
