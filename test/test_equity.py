@@ -16,6 +16,7 @@ class TestEquity(unittest.TestCase):
         self.assertEqual(instance.is_vested_by(today), True)
         self.assertEqual(instance.is_vested_by(yesterday), False)
 
+    # Happy path test
     def test_from_rsu(self):
         vest_date = date(2020, 7, 8)
         shares = 5.0
@@ -26,6 +27,7 @@ class TestEquity(unittest.TestCase):
         self.assertEqual(instance.date, vest_date)
         self.assertEqual(instance.value, exp_value)
 
+    # Happy path test
     def test_from_option(self):
         vest_date = date(2021, 2, 3)
         shares = 5.0
@@ -38,10 +40,20 @@ class TestEquity(unittest.TestCase):
         self.assertEqual(instance.value, exp_value)
 
     # Options can be worthless but they can't cost you money
-    def test_from_underwater_option(self):
+    def test_from_option_underwater(self):
         shares = 5.0
         current_price = 10.0
         strike_price = 14.0
+        exp_value = 0.0
+        instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price)
+
+        self.assertEqual(instance.value, exp_value)
+
+    # Edge case of current price being exactly the strike price
+    def test_from_option_precisely_worthless(self):
+        shares = 5.0
+        current_price = 10.0
+        strike_price = 10.0
         exp_value = 0.0
         instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price)
 
