@@ -19,9 +19,18 @@
 import locale
 from datetime import date
 
+
 class Equity:
-    def __init__(self, date_str, value):
-        self.date = date.fromisoformat(date_str)
+    """
+    Represents a piece of equity
+
+    This is not very useful by itself, but is used to build a EquityGroup,
+    which can model a RSU or NSO grant with multiple vesting dates.
+    """
+
+    # Accept either a date object or an ISO8601 date string
+    def __init__(self, vest_date, value):
+        self.date = vest_date if isinstance(vest_date, date) else date.fromisoformat(vest_date)
         self.value = value
 
     def __repr__(self):
