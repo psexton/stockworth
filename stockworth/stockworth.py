@@ -38,23 +38,19 @@ def main():
     # look up current price
     ticker_symbol = config["symbol"]
     latest_price = get_latest_price(ticker_symbol, config["apikey"])
-    # print(f"stock={ticker_symbol}, latest_price={latest_price:,.2f}")
 
     # convert RSUs and options into date/value pairs
     all_equity = convert_to_equity(latest_price, config)
 
     # compute total value
     total_value = all_equity.total_value()
-    # print(f"total_value={format_currency(total_value)}")
 
     # split out unvested equity from vested
     vested_value = all_equity.vested_value()
     unvested_value = total_value - vested_value
-    # print(f"vested_value={format_currency(vested_value)}")
 
     # produce threshold/date pairs
     thresholds = compute_thresholds(threshold_values=config["thresholds"], equity=all_equity)
-    # print(f"thresholds={thresholds}")
 
     # pretty print
     message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
@@ -109,7 +105,6 @@ def convert_to_equity(latest_price, config):
         ),
         config["rsus"]
     ))
-    # print(f"rsus={rsus}")
 
     # convert options into date/value pairs
     options = list(map(
@@ -121,7 +116,6 @@ def convert_to_equity(latest_price, config):
         ),
         config["options"]
     ))
-    # print(f"options={options}")
 
     return EquityGroup(rsus + options)
 
