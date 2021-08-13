@@ -20,6 +20,14 @@ from datetime import date
 
 
 class Threshold:
+    """
+    A threshold is a milestone for future vesting
+
+    It answers the question of "How long do I have to stay to leave less than X on the table"
+    Given an EquityGroup, and an amount, it computes the date on which the group's unvested
+    equity is less than that amount.
+    """
+
     def __init__(self, amount, equity_group):
         self.amount = amount
         self.equity_group = equity_group
@@ -29,12 +37,15 @@ class Threshold:
         return f"({self.amount} -> {self.date})"
 
     def _compute_date(self):
-        # Need to compute when unvested equity will be less than the threshold amount
-        # Subtract the threshold from the total equity value
+        # We don't expect to have more than 10s of entries, so a linear search is fine
+        # Iterate through all vesting dates in ascending order, until we find one where
+        # the unvested value is less than the threshold amount.
+        # All equity vests _eventually_, at which point unvested will be 0,
+        # so we're guaranteed to find an answer.
+
         total_equity_value = self.equity_group.total_value()
         vested_at_threshold = total_equity_value - self.amount
-        # Now iterate over equity vest dates, in ascending order,
-        # until that value is >= the subtraction result
+        
         vesting_dates = sorted(self.equity_group.vesting_dates)
         for vesting_date in vesting_dates:
             if self.equity_group.value_at(vesting_date) >= vested_at_threshold:
