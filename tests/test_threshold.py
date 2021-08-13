@@ -53,7 +53,7 @@ class TestThreshold(unittest.TestCase):
     def test_threshold_0(self):
         # To leave nothing unvested, everything needs to vest
         amount = 0.0
-        exp_result = Threshold(amount, self.next_month[1].date)
+        exp_result = Threshold(amount, self.next_year[0].date)
         result = self.instance.compute_threshold(amount)
         self.assertEqual(result, exp_result)
 

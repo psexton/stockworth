@@ -16,21 +16,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # </editor-fold>
 
+from collections import namedtuple
 
-class Threshold:
-    """
-    A threshold is a milestone for future vesting
+""" 
+A threshold is a milestone for future vesting
 
     It answers the question of "How long do I have to stay to leave less than X on the table"
     Given an EquityGroup, and an amount, it computes the date on which the group's unvested
     equity is less than that amount.
 
     Thresholds are created using the `compute_threshold(s)` methods of an EquityGroup.
-    """
-
-    def __init__(self, amount, date):
-        self.amount = amount
-        self.date = date
-
-    def __repr__(self):
-        return f"({self.amount} -> {self.date})"
+"""
+Threshold = namedtuple("Threshold", ["amount", "date"])
