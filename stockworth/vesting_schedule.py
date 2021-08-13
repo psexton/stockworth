@@ -17,14 +17,16 @@
 # </editor-fold>
 
 from datetime import date
+from util import format_currency
 
 
 # Given a EquityGroup, bin the value by vesting month.
 # Put everything already vested in a single bin.
+
 class VestingSchedule:
     def __init__(self, equity_group):
         self.equity_group = equity_group
-        self.already_vested = date.fromisoformat('2000-01-01') # flag date for "already vested"
+        self.already_vested = date.fromisoformat('2000-01-01')  # flag date for "already vested"
         self.vesting_months = self._compute_schedule()
 
     def _compute_schedule(self):
@@ -43,3 +45,13 @@ class VestingSchedule:
                 else:
                     output[month] = equity.value
         return output
+
+    def compute_and_format_schedule(self):
+        # sort the dictionary,
+        # and replace the flag date with "Vested"
+        formatted_lines = []
+        for key, value in sorted(self.vesting_months.items()):
+            formatted_key = "Vested" if key == self.already_vested else key.strftime("%b %Y")
+            formatted_value = format_currency(value)
+            formatted_lines.append(f"{formatted_key}: {formatted_value}")
+        return formatted_lines

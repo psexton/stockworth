@@ -22,13 +22,12 @@ import argparse
 import json
 import os
 from alpha_vantage.timeseries import TimeSeries
-from datetime import date
-from dateutil.relativedelta import relativedelta
 
 from equity import Equity
 from equity_group import EquityGroup
-from threshold import Threshold
+from util import format_currency, format_date_delta
 from vesting_schedule import VestingSchedule
+from threshold import Threshold
 
 
 def main():
@@ -56,7 +55,7 @@ def main():
     message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
               f"At that price, your total equity is worth {format_currency(total_value)}." \
               f"\nYour vesting schedule is"
-    for entry in compute_and_format_vesting_schedule(all_equity):
+    for entry in VestingSchedule(all_equity).compute_and_format_schedule():
         message += f"\n\t{entry}"
     message += f"\nIf you quit today, you will be walking away from {format_currency(unvested_value)}."
     for threshold in thresholds:
@@ -123,30 +122,6 @@ def convert_to_equity(latest_price, config):
 def compute_thresholds(threshold_values, equity):
     thresholds = list(map(lambda threshold: Threshold(threshold, equity), threshold_values))
     return thresholds
-
-
-def compute_and_format_vesting_schedule(all_equity):
-    # produce vesting schedule
-    schedule = VestingSchedule(all_equity)
-    # sort the dictionary,
-    # and replace the flag date with "Vested"
-    formatted_lines = []
-    for key, value in sorted(schedule.vesting_months.items()):
-        formatted_key = "Vested" if key == schedule.already_vested else key.strftime("%b %Y")
-        formatted_value = format_currency(value)
-        formatted_lines.append(f"{formatted_key}: {formatted_value}")
-    return formatted_lines
-
-
-def format_currency(amount):
-    # prefix with $, separate at thousands with ',', no decimal places
-    return f"${amount:,.0f}"
-
-
-def format_date_delta(future_date):
-    start_date = date.today()
-    diff = relativedelta(future_date, start_date)
-    return f"{diff.years} years, {diff.months} months, and {diff.days} days"
 
 
 if __name__ == "__main__":
