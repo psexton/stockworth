@@ -85,5 +85,6 @@ class TestEquityGroup(unittest.TestCase):
         exp_result = self.last_month_value + self.next_month_value + self.next_year_value
         self.assertEqual(result, exp_result)
 
+
 if __name__ == '__main__':
     unittest.main()

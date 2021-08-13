@@ -36,6 +36,4 @@ class EquityGroup:
 
     def value_at(self, target_date):
         """ The value of the group at a given date """
-        # partition equity_list by vesting_date
-        # sum the ones with a vesting_date <= target_date
-        return sum(e.value for e in self.equity_list if e.is_vested_by(target_date))
+        return sum(e.value_at(target_date) for e in self.equity_list)

@@ -24,15 +24,23 @@ from stockworth.equity import Equity
 
 class TestEquity(unittest.TestCase):
 
-    def test_is_vested_by(self):
-        today = date.today()
-        yesterday = today - timedelta(days = 1)
-        tomorrow = today + timedelta(days = 1)
-        instance = Equity(today, 100.0)
+    def test_value_at_today(self):
+        instance = Equity(date.today(), 100.0)
+        result = instance.value_at(date.today())
+        exp_result = instance.value
+        self.assertEqual(result, exp_result)
 
-        self.assertEqual(instance.is_vested_by(tomorrow), True)
-        self.assertEqual(instance.is_vested_by(today), True)
-        self.assertEqual(instance.is_vested_by(yesterday), False)
+    def test_value_at_past(self):
+        instance = Equity(date.today(), 100.0)
+        result = instance.value_at(date.today() - timedelta(days=1))
+        exp_result = 0.0
+        self.assertEqual(result, exp_result)
+
+    def test_value_at_future(self):
+        instance = Equity(date.today(), 100.0)
+        result = instance.value_at(date.today() + timedelta(days=1))
+        exp_result = instance.value
+        self.assertEqual(result, exp_result)
 
     # Happy path test
     def test_from_rsu(self):

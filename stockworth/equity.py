@@ -36,8 +36,9 @@ class Equity:
     def __repr__(self):
         return f"({self.date} -> {locale.currency(self.value)})"
 
-    def is_vested_by(self, target_date):
-        return self.date <= target_date
+    def value_at(self, target_date):
+        """ The value of the equity at a given date """
+        return self.value if target_date >= self.date else 0.0
 
     @staticmethod
     def from_rsu(current_price, quantity, vest_date):
