@@ -16,8 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # </editor-fold>
 
-from datetime import date
-
 
 class Threshold:
     """
@@ -26,27 +24,13 @@ class Threshold:
     It answers the question of "How long do I have to stay to leave less than X on the table"
     Given an EquityGroup, and an amount, it computes the date on which the group's unvested
     equity is less than that amount.
+
+    Thresholds are created using the `compute_threshold(s)` methods of an EquityGroup.
     """
 
-    def __init__(self, amount, equity_group):
+    def __init__(self, amount, date):
         self.amount = amount
-        self.equity_group = equity_group
-        self.date = self._compute_date()
+        self.date = date
 
     def __repr__(self):
         return f"({self.amount} -> {self.date})"
-
-    def _compute_date(self):
-        # We don't expect to have more than 10s of entries, so a linear search is fine
-        # Iterate through all vesting dates in ascending order, until we find one where
-        # the unvested value is less than the threshold amount.
-        # All equity vests _eventually_, at which point unvested will be 0,
-        # so we're guaranteed to find an answer.
-
-        total_equity_value = self.equity_group.total_value()
-        vested_at_threshold = total_equity_value - self.amount
-        
-        vesting_dates = sorted(self.equity_group.vesting_dates)
-        for vesting_date in vesting_dates:
-            if self.equity_group.value_at(vesting_date) >= vested_at_threshold:
-                return vesting_date

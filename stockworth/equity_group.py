@@ -18,6 +18,8 @@
 
 from datetime import date
 
+from threshold import Threshold
+
 
 class EquityGroup:
     """ Models a RSU or NSO grant with multiple vesting dates """
@@ -37,3 +39,22 @@ class EquityGroup:
     def value_at(self, target_date):
         """ The value of the group at a given date """
         return sum(e.value_at(target_date) for e in self.equity_list)
+
+    def compute_threshold(self, amount):
+        """
+        Compute a threshold for this equity group
+        For an amount X, the threshold date is when this group's unvested equity will be less than X.
+        """
+        # We don't expect to have more than 10s of entries, so a linear search is fine
+        # Iterate through all vesting dates in ascending order, until we find one where
+        # the unvested value is less than the threshold amount.
+        # All equity vests _eventually_, at which point unvested will be 0,
+        # so we're guaranteed to find an answer.
+
+        total_equity_value = self.total_value()
+        vested_at_threshold = total_equity_value - amount
+
+        sorted_vesting_dates = sorted(self.vesting_dates)
+        for vesting_date in sorted_vesting_dates:
+            if self.value_at(vesting_date) >= vested_at_threshold:
+                return Threshold(amount, vesting_date)

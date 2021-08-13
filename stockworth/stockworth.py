@@ -27,7 +27,6 @@ from equity import Equity
 from equity_group import EquityGroup
 from util import format_currency, format_date_delta
 from vesting_schedule import VestingSchedule
-from threshold import Threshold
 
 
 def main():
@@ -120,7 +119,7 @@ def convert_to_equity(latest_price, config):
 
 
 def compute_thresholds(threshold_values, equity):
-    thresholds = list(map(lambda threshold: Threshold(threshold, equity), threshold_values))
+    thresholds = list(map(lambda threshold: equity.compute_threshold(threshold), threshold_values))
     return thresholds
 
 
