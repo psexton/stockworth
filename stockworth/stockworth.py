@@ -48,7 +48,7 @@ def main():
     unvested_value = total_value - vested_value
 
     # produce threshold/date pairs
-    thresholds = compute_thresholds(threshold_values=config["thresholds"], equity=all_equity)
+    thresholds = all_equity.compute_thresholds(amounts = config["thresholds"])
 
     # pretty print
     message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
@@ -117,10 +117,6 @@ def convert_to_equity(latest_price, config):
 
     return EquityGroup(rsus + options)
 
-
-def compute_thresholds(threshold_values, equity):
-    thresholds = list(map(lambda threshold: equity.compute_threshold(threshold), threshold_values))
-    return thresholds
 
 
 if __name__ == "__main__":

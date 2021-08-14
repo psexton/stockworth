@@ -40,6 +40,9 @@ class EquityGroup:
         """ The value of the group at a given date """
         return sum(e.value_at(target_date) for e in self.equity_list)
 
+    def compute_thresholds(self, amounts):
+        return list(map(lambda amount: self.compute_threshold(amount), amounts))
+
     def compute_threshold(self, amount):
         """
         Compute a threshold for this equity group
@@ -51,10 +54,8 @@ class EquityGroup:
         # All equity vests _eventually_, at which point unvested will be 0,
         # so we're guaranteed to find an answer.
 
-        total_equity_value = self.total_value()
-        vested_at_threshold = total_equity_value - amount
-
         sorted_vesting_dates = sorted(self.vesting_dates)
         for vesting_date in sorted_vesting_dates:
+            vested_at_threshold = self.total_value() - amount
             if self.value_at(vesting_date) >= vested_at_threshold:
                 return Threshold(amount, vesting_date)
