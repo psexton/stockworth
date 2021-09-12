@@ -21,6 +21,8 @@
 import argparse
 import json
 import os
+from datetime import date
+
 from alpha_vantage.timeseries import TimeSeries
 
 from equity import Equity
@@ -58,7 +60,8 @@ def main():
         message += f"\n\t{entry}"
     message += f"\nIf you quit today, you will be walking away from {format_currency(unvested_value)}."
     for threshold in thresholds:
-        message += f"\n\tOnly {format_date_delta(threshold.date)} until that's less than {format_currency(threshold.amount)}."
+        if threshold.date > date.today():
+            message += f"\n\tOnly {format_date_delta(threshold.date)} until that's less than {format_currency(threshold.amount)}."
     message += "\nHang in there!"
     print(message)
 
