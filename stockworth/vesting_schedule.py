@@ -17,6 +17,8 @@
 # </editor-fold>
 
 from datetime import date
+
+from schedule_bin import ScheduleBin
 from util import format_currency
 
 
@@ -26,35 +28,22 @@ from util import format_currency
 class VestingSchedule:
     def __init__(self, equity_group):
         self.equity_group = equity_group
-        self.already_vested = date.fromisoformat('2000-01-01')  # flag date for "already vested"
         self.vesting_bins = self._compute_schedule()
 
     def _compute_schedule(self):
         output = {}
         for equity in self.equity_group.equity_list:
-            key = self.schedule_key_for(equity)
+            key = ScheduleBin(equity)
             if key in output:
                 output[key] = output[key] + equity.value
             else:
                 output[key] = equity.value
         return output
 
-    def schedule_key_for(self, equity):
-        if equity.date <= date.today():
-            return self.already_vested
-        else:
-            return equity.date.replace(day=1)
-
-    def format_key(self, schedule_key):
-        # Replace the flag date with "Vested"
-        formatted_key = "Vested" if schedule_key == self.already_vested else schedule_key.strftime("%b %Y")
-        return formatted_key
-
     def compute_and_format_schedule(self):
         # sort the dictionary,
         formatted_lines = []
         for key, value in sorted(self.vesting_bins.items()):
-            formatted_key = self.format_key(key)
             formatted_value = format_currency(value)
-            formatted_lines.append(f"{formatted_key}: {formatted_value}")
+            formatted_lines.append(f"{key}: {formatted_value}")
         return formatted_lines
