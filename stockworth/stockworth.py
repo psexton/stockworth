@@ -35,7 +35,7 @@ def main():
 
     # look up current price
     ticker_symbol = config["symbol"]
-    latest_price = get_latest_price(ticker_symbol, config["apikey"])
+    latest_price = config["price"]
 
     # convert RSUs and options into date/value pairs
     all_equity = convert_to_equity(latest_price, config)
@@ -48,7 +48,7 @@ def main():
     unvested_value = total_value - vested_value
 
     # produce threshold/date pairs
-    thresholds = all_equity.compute_thresholds(amounts = config["thresholds"])
+    thresholds = all_equity.compute_thresholds(amounts=config["thresholds"])
 
     # pretty print
     message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
@@ -68,18 +68,25 @@ def read_config():
     parser = argparse.ArgumentParser(prog="stockworth.py")
     parser.add_argument("-f", "--file", default="config.json",
                         help="The json file to read the config from (defaults to config.json).")
+    parser.add_argument("-p", "--price", type=float, help="The price to use instead of the most recent closing price")
     args = parser.parse_args()
 
     with open(args.file, 'r') as config_file:
         config = json.loads(config_file.read())
 
-    # if config did not contain apikey, try to read it from env var
-    if not "apikey" in config:
-        env_api_key = os.getenv("ALPHAVANTAGE_API_KEY")
-        if env_api_key is None:
-            raise Exception("Could not find api key")
-        else:
-            config["apikey"] = env_api_key
+    # If price was specified as an arg, copy it into the config
+    # Otherwise, we'll need an apikey to look it up
+    if args.price is not None:
+        config["price"] = args.price
+    else:
+        # if config did not contain apikey, try to read it from env var
+        if "apikey" not in config:
+            env_api_key = os.getenv("ALPHAVANTAGE_API_KEY")
+            if env_api_key is None:
+                raise Exception("Could not find api key, and price override was not specified")
+            else:
+                config["apikey"] = env_api_key
+        config["price"] = get_latest_price(config["symbol"], config["apikey"])
 
     return config
 
@@ -116,7 +123,6 @@ def convert_to_equity(latest_price, config):
     ))
 
     return EquityGroup(rsus + options)
-
 
 
 if __name__ == "__main__":

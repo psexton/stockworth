@@ -29,6 +29,14 @@ Only 2 years, 0 months, and 29 days until that's less than $100,000.
 Hang in there!
 ```
 
+You can also pass in the stock price, useful for evaulating different future price scenarios.
+
+```
+$  ./stockworth/stockworth.py --file example_config.json --price 500
+GME last closed at 500.00. At that price, your total equity is worth $3,081,574.
+<!---SNIP--->
+```
+
 ## Testing
 
 ```
