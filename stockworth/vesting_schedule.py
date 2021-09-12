@@ -27,31 +27,34 @@ class VestingSchedule:
     def __init__(self, equity_group):
         self.equity_group = equity_group
         self.already_vested = date.fromisoformat('2000-01-01')  # flag date for "already vested"
-        self.vesting_months = self._compute_schedule()
+        self.vesting_bins = self._compute_schedule()
 
     def _compute_schedule(self):
-        vested_key = self.already_vested
         output = {}
         for equity in self.equity_group.equity_list:
-            if equity.date <= date.today():
-                if vested_key in output:
-                    output[vested_key] = output[vested_key] + equity.value
-                else:
-                    output[vested_key] = equity.value
+            key = self.schedule_key_for(equity)
+            if key in output:
+                output[key] = output[key] + equity.value
             else:
-                month = equity.date.replace(day=1)
-                if month in output:
-                    output[month] = output[month] + equity.value
-                else:
-                    output[month] = equity.value
+                output[key] = equity.value
         return output
+
+    def schedule_key_for(self, equity):
+        if equity.date <= date.today():
+            return self.already_vested
+        else:
+            return equity.date.replace(day=1)
+
+    def format_key(self, schedule_key):
+        # Replace the flag date with "Vested"
+        formatted_key = "Vested" if schedule_key == self.already_vested else schedule_key.strftime("%b %Y")
+        return formatted_key
 
     def compute_and_format_schedule(self):
         # sort the dictionary,
-        # and replace the flag date with "Vested"
         formatted_lines = []
-        for key, value in sorted(self.vesting_months.items()):
-            formatted_key = "Vested" if key == self.already_vested else key.strftime("%b %Y")
+        for key, value in sorted(self.vesting_bins.items()):
+            formatted_key = self.format_key(key)
             formatted_value = format_currency(value)
             formatted_lines.append(f"{formatted_key}: {formatted_value}")
         return formatted_lines
