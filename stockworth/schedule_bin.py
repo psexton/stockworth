@@ -16,8 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # </editor-fold>
 
-
 from datetime import date
+from interval import Interval
 
 
 class ScheduleBin:
@@ -29,8 +29,9 @@ class ScheduleBin:
 
     already_vested = date.fromisoformat('2000-01-01')  # flag date for "already vested"
 
-    def __init__(self, equity):
+    def __init__(self, equity, interval):
         self.equity = equity
+        self.interval = interval
         self.key = self.compute_key()
 
     def __hash__(self):
@@ -48,9 +49,18 @@ class ScheduleBin:
         if equity_date <= date.today():
             return self.already_vested
         else:
-            return equity_date.replace(day=1)
+            if self.interval is Interval.MONTHLY:
+                return equity_date.replace(day=1)
+            else:
+                return equity_date.replace(day=1, month=1)
 
     # Formatted string version
     def __repr__(self):
         # Replace the flag date with "Vested"
-        return "Vested" if self.key == self.already_vested else self.key.strftime("%b %Y")
+        if self.key == self.already_vested:
+            return "Vested"
+        else:
+            if self.interval is Interval.MONTHLY:
+                return self.key.strftime("%b %Y")
+            else:
+                return self.key.strftime("%Y")

@@ -26,14 +26,14 @@ from util import format_currency
 # Put everything already vested in a single bin.
 
 class VestingSchedule:
-    def __init__(self, equity_group):
+    def __init__(self, equity_group, bin_size):
         self.equity_group = equity_group
-        self.vesting_bins = self._compute_schedule()
+        self.vesting_bins = self._compute_schedule(bin_size)
 
-    def _compute_schedule(self):
+    def _compute_schedule(self, bin_size):
         output = {}
         for equity in self.equity_group.equity_list:
-            key = ScheduleBin(equity)
+            key = ScheduleBin(equity, bin_size)
             if key in output:
                 output[key] = output[key] + equity.value
             else:

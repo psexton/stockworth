@@ -27,6 +27,7 @@ from alpha_vantage.timeseries import TimeSeries
 
 from equity import Equity
 from equity_group import EquityGroup
+from interval import Interval
 from util import format_currency, format_date_delta
 from vesting_schedule import VestingSchedule
 
@@ -56,7 +57,7 @@ def main():
     message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
               f"At that price, your total equity is worth {format_currency(total_value)}." \
               f"\nYour vesting schedule is"
-    for entry in VestingSchedule(all_equity).compute_and_format_schedule():
+    for entry in VestingSchedule(all_equity, config["bin_size"]).compute_and_format_schedule():
         message += f"\n\t{entry}"
     message += f"\nIf you quit today, you will be walking away from {format_currency(unvested_value)}."
     for threshold in thresholds:
@@ -72,6 +73,8 @@ def read_config():
     parser.add_argument("-f", "--file", default="config.json",
                         help="The json file to read the config from (defaults to config.json).")
     parser.add_argument("-p", "--price", type=float, help="The price to use instead of the most recent closing price")
+    parser.add_argument("-i", "--interval", choices=tuple(t.name.lower() for t in Interval),
+                        default=Interval.YEARLY.name.lower(), help="The interval to use for vesting periods (defaults to yearly)")
     args = parser.parse_args()
 
     with open(args.file, 'r') as config_file:
@@ -90,6 +93,9 @@ def read_config():
             else:
                 config["apikey"] = env_api_key
         config["price"] = get_latest_price(config["symbol"], config["apikey"])
+
+    # Copy ScheduleBinSize from args to config
+    config["bin_size"] = Interval[args.interval.upper()]
 
     return config
 
