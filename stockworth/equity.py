@@ -41,13 +41,15 @@ class Equity:
         return self.value if target_date >= self.date else 0.0
 
     @staticmethod
-    def from_rsu(current_price, quantity, vest_date):
+    def from_rsu(current_price, quantity, vest_date, tax_rate):
         value = current_price * quantity
-        return Equity(vest_date, value)
+        after_tax_value = value * (1.0 - tax_rate)
+        return Equity(vest_date, after_tax_value)
 
     @staticmethod
-    def from_option(current_price, quantity, vest_date, strike_price):
+    def from_option(current_price, quantity, vest_date, strike_price, tax_rate):
         purchase_price = quantity * strike_price
         sale_price = current_price * quantity
         value = max(sale_price - purchase_price, 0.0)  # options have a minimum value of worthless
-        return Equity(vest_date, value)
+        after_tax_value = value * (1.0 - tax_rate)
+        return Equity(vest_date, after_tax_value)

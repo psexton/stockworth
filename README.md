@@ -37,6 +37,17 @@ GME last closed at 500.00. At that price, your total equity is worth $3,081,574.
 <!---SNIP--->
 ```
 
+If you want to see the valuation post-tax instead of pre-tax, you can specify that either as a config file entry or as an arg at runtime.
+```
+{
+    "tax_rate": 0.25
+}
+```
+
+```
+./stockworth/stockworth.py --tax-rate 0.25
+```
+
 ## Testing
 
 ```

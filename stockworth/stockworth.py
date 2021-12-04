@@ -53,9 +53,11 @@ def main():
     # produce threshold/date pairs
     thresholds = all_equity.compute_thresholds(amounts=config["thresholds"])
 
+    message_tax_suffix = "(post-tax)" if config["tax_rate"] > 0.0 else "(pre-tax)"
+
     # pretty print
     message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
-              f"At that price, your total equity is worth {format_currency(total_value)}." \
+              f"At that price, your total equity is worth {format_currency(total_value)} {message_tax_suffix}." \
               f"\nYour vesting schedule is"
     for entry in VestingSchedule(all_equity, config["bin_size"]).compute_and_format_schedule():
         message += f"\n\t{entry}"
@@ -74,7 +76,9 @@ def read_config():
                         help="The json file to read the config from (defaults to config.json).")
     parser.add_argument("-p", "--price", type=float, help="The price to use instead of the most recent closing price")
     parser.add_argument("-i", "--interval", choices=tuple(t.name.lower() for t in Interval),
-                        default=Interval.YEARLY.name.lower(), help="The interval to use for vesting periods (defaults to yearly)")
+                        default=Interval.YEARLY.name.lower(), help="The interval to use for vesting periods (defaults "
+                                                                   "to yearly)")
+    parser.add_argument("-t", "--tax", type=float, help="Tax rate. If provided, after-tax values will be shown.")
     args = parser.parse_args()
 
     with open(args.file, 'r') as config_file:
@@ -93,6 +97,14 @@ def read_config():
             else:
                 config["apikey"] = env_api_key
         config["price"] = get_latest_price(config["symbol"], config["apikey"])
+
+    # If tax rate was specified as an arg, copy it into the config
+    # Otherwise, default to 0
+    if args.tax is not None:
+        config["tax_rate"] = args.tax
+    else:
+        if "tax_rate" not in config:
+            config["tax_rate"] = 0.0
 
     # Copy ScheduleBinSize from args to config
     config["bin_size"] = Interval[args.interval.upper()]
@@ -115,7 +127,8 @@ def convert_to_equity(latest_price, config):
         lambda rsu: Equity.from_rsu(
             current_price=latest_price,
             quantity=rsu["qty"],
-            vest_date=rsu["vest_date"]
+            vest_date=rsu["vest_date"],
+            tax_rate=config["tax_rate"]
         ),
         config["rsus"]
     ))
@@ -126,7 +139,8 @@ def convert_to_equity(latest_price, config):
             current_price=latest_price,
             quantity=option["qty"],
             vest_date=option["vest_date"],
-            strike_price=option["price"]
+            strike_price=option["price"],
+            tax_rate=config["tax_rate"]
         ),
         config["options"]
     ))
