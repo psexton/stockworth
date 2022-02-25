@@ -79,6 +79,7 @@ def read_config():
                         default=Interval.YEARLY.name.lower(), help="The interval to use for vesting periods (defaults "
                                                                    "to yearly)")
     parser.add_argument("-t", "--tax", type=float, help="Tax rate. If provided, after-tax values will be shown.")
+    parser.add_argument("--rsu-only", action='store_true', default=False, help="Ignore NSOs")
     args = parser.parse_args()
 
     with open(args.file, 'r') as config_file:
@@ -105,6 +106,9 @@ def read_config():
     else:
         if "tax_rate" not in config:
             config["tax_rate"] = 0.0
+
+    config["use_rsus"] = True
+    config["use_nsos"] = not args.rsu_only
 
     # Copy ScheduleBinSize from args to config
     config["bin_size"] = Interval[args.interval.upper()]
@@ -145,7 +149,13 @@ def convert_to_equity(latest_price, config):
         config["options"]
     ))
 
-    return EquityGroup(rsus + options)
+    equity_inputs_to_use = list()
+    if config["use_rsus"]:
+        equity_inputs_to_use = equity_inputs_to_use + rsus
+    if config["use_nsos"]:
+        equity_inputs_to_use = equity_inputs_to_use + options
+
+    return EquityGroup(equity_inputs_to_use)
 
 
 if __name__ == "__main__":
