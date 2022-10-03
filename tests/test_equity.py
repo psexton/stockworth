@@ -47,8 +47,9 @@ class TestEquity(unittest.TestCase):
         vest_date = date(2020, 7, 8)
         shares = 5.0
         price = 12.5
+        tax_rate = 0.0
         exp_value = shares * price
-        instance = Equity.from_rsu(price, shares, vest_date.isoformat())
+        instance = Equity.from_rsu(price, shares, vest_date.isoformat(), tax_rate)
 
         self.assertEqual(instance.date, vest_date)
         self.assertEqual(instance.value, exp_value)
@@ -59,8 +60,9 @@ class TestEquity(unittest.TestCase):
         shares = 5.0
         current_price = 15.0
         strike_price = 14.0
+        tax_rate = 0.0
         exp_value = (current_price - strike_price) * shares
-        instance = Equity.from_option(current_price, shares, vest_date.isoformat(), strike_price)
+        instance = Equity.from_option(current_price, shares, vest_date.isoformat(), strike_price, tax_rate)
 
         self.assertEqual(instance.date, vest_date)
         self.assertEqual(instance.value, exp_value)
@@ -70,8 +72,9 @@ class TestEquity(unittest.TestCase):
         shares = 5.0
         current_price = 10.0
         strike_price = 14.0
+        tax_rate = 0.0
         exp_value = 0.0
-        instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price)
+        instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price, tax_rate)
 
         self.assertEqual(instance.value, exp_value)
 
@@ -80,11 +83,36 @@ class TestEquity(unittest.TestCase):
         shares = 5.0
         current_price = 10.0
         strike_price = 10.0
+        tax_rate = 0.0
         exp_value = 0.0
-        instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price)
+        instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price, tax_rate)
 
         self.assertEqual(instance.value, exp_value)
 
+    # Tax withholdings test (rsu)
+    def test_from_rsu_posttax(self):
+        vest_date = date(2020, 7, 8)
+        shares = 5.0
+        price = 12.5
+        tax_rate = 0.1
+        exp_value = shares * price * 0.9
+        instance = Equity.from_rsu(price, shares, vest_date.isoformat(), tax_rate)
+
+        self.assertEqual(instance.date, vest_date)
+        self.assertEqual(instance.value, exp_value)
+
+    # Tax withholdings test (nso)
+    def test_from_option(self):
+        vest_date = date(2021, 2, 3)
+        shares = 5.0
+        current_price = 15.0
+        strike_price = 14.0
+        tax_rate = 0.1
+        exp_value = (current_price - strike_price) * shares * 0.9
+        instance = Equity.from_option(current_price, shares, vest_date.isoformat(), strike_price, tax_rate)
+
+        self.assertEqual(instance.date, vest_date)
+        self.assertEqual(instance.value, exp_value)
 
 if __name__ == '__main__':
     unittest.main()
