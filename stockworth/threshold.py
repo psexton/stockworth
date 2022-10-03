@@ -18,7 +18,7 @@
 
 from collections import namedtuple
 
-""" 
+"""
 A threshold is a milestone for future vesting
 
     It answers the question of "How long do I have to stay to leave less than X on the table"

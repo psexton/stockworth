@@ -1,6 +1,6 @@
 # stockworth
 
-Prints out an inspirational message telling you just how large your golden handcuffs are. The script only works for a single stock, and isn't smart enough to figure out vesting schedules. You need to enter in every payout. It does handle both RSUs and NSOs though. 
+Prints out an inspirational message telling you just how large your golden handcuffs are. The script only works for a single stock, and isn't smart enough to figure out vesting schedules. You need to enter in every payout. It does handle both RSUs and NSOs though.
 
 Inspired by [JWZ's worth.pl script](https://www.jwz.org/hacks/).
 
