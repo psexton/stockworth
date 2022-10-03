@@ -23,7 +23,6 @@ from stockworth.equity import Equity
 
 
 class TestEquity(unittest.TestCase):
-
     def test_value_at_today(self):
         instance = Equity(date.today(), 100.0)
         result = instance.value_at(date.today())
@@ -62,7 +61,9 @@ class TestEquity(unittest.TestCase):
         strike_price = 14.0
         tax_rate = 0.0
         exp_value = (current_price - strike_price) * shares
-        instance = Equity.from_option(current_price, shares, vest_date.isoformat(), strike_price, tax_rate)
+        instance = Equity.from_option(
+            current_price, shares, vest_date.isoformat(), strike_price, tax_rate
+        )
 
         self.assertEqual(instance.date, vest_date)
         self.assertEqual(instance.value, exp_value)
@@ -74,7 +75,9 @@ class TestEquity(unittest.TestCase):
         strike_price = 14.0
         tax_rate = 0.0
         exp_value = 0.0
-        instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price, tax_rate)
+        instance = Equity.from_option(
+            current_price, shares, date.today().isoformat(), strike_price, tax_rate
+        )
 
         self.assertEqual(instance.value, exp_value)
 
@@ -85,7 +88,9 @@ class TestEquity(unittest.TestCase):
         strike_price = 10.0
         tax_rate = 0.0
         exp_value = 0.0
-        instance = Equity.from_option(current_price, shares, date.today().isoformat(), strike_price, tax_rate)
+        instance = Equity.from_option(
+            current_price, shares, date.today().isoformat(), strike_price, tax_rate
+        )
 
         self.assertEqual(instance.value, exp_value)
 
@@ -109,10 +114,13 @@ class TestEquity(unittest.TestCase):
         strike_price = 14.0
         tax_rate = 0.1
         exp_value = (current_price - strike_price) * shares * 0.9
-        instance = Equity.from_option(current_price, shares, vest_date.isoformat(), strike_price, tax_rate)
+        instance = Equity.from_option(
+            current_price, shares, vest_date.isoformat(), strike_price, tax_rate
+        )
 
         self.assertEqual(instance.date, vest_date)
         self.assertEqual(instance.value, exp_value)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

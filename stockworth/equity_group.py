@@ -22,22 +22,22 @@ from threshold import Threshold
 
 
 class EquityGroup:
-    """ Models a RSU or NSO grant with multiple vesting dates """
+    """Models a RSU or NSO grant with multiple vesting dates"""
 
     def __init__(self, equity_list):
         self.equity_list = equity_list
         self.vesting_dates = set(e.date for e in equity_list)
 
     def total_value(self):
-        """ The value after all equities in the group have vested """
+        """The value after all equities in the group have vested"""
         return sum(e.value for e in self.equity_list)
 
     def vested_value(self):
-        """ The value of the group today """
+        """The value of the group today"""
         return self.value_at(date.today())
 
     def value_at(self, target_date):
-        """ The value of the group at a given date """
+        """The value of the group at a given date"""
         return sum(e.value_at(target_date) for e in self.equity_list)
 
     def compute_thresholds(self, amounts):

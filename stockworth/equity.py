@@ -30,14 +30,16 @@ class Equity:
 
     # Accept either a date object or an ISO8601 date string
     def __init__(self, vest_date, value):
-        self.date = vest_date if isinstance(vest_date, date) else date.fromisoformat(vest_date)
+        self.date = (
+            vest_date if isinstance(vest_date, date) else date.fromisoformat(vest_date)
+        )
         self.value = value
 
     def __repr__(self):
         return f"({self.date} -> {locale.currency(self.value)})"
 
     def value_at(self, target_date):
-        """ The value of the equity at a given date """
+        """The value of the equity at a given date"""
         return self.value if target_date >= self.date else 0.0
 
     @staticmethod
@@ -50,6 +52,8 @@ class Equity:
     def from_option(current_price, quantity, vest_date, strike_price, tax_rate):
         purchase_price = quantity * strike_price
         sale_price = current_price * quantity
-        value = max(sale_price - purchase_price, 0.0)  # options have a minimum value of worthless
+        value = max(
+            sale_price - purchase_price, 0.0
+        )  # options have a minimum value of worthless
         after_tax_value = value * (1.0 - tax_rate)
         return Equity(vest_date, after_tax_value)

@@ -24,18 +24,17 @@ from stockworth.equity_group import EquityGroup
 
 
 class TestEquityGroup(unittest.TestCase):
-
     def setUp(self):
         today = date.today()
         self.last_month = [
             Equity(today - timedelta(days=40), 100.0),
             Equity(today - timedelta(days=42), 100.0),
-            Equity(today - timedelta(days=44), 100.0)
+            Equity(today - timedelta(days=44), 100.0),
         ]
         self.last_month_value = 300
         self.next_month = [
             Equity(today + timedelta(days=46), 10.0),
-            Equity(today + timedelta(days=48), 10.0)
+            Equity(today + timedelta(days=48), 10.0),
         ]
         self.next_month_value = 20
         self.next_year = [Equity(today + timedelta(days=365), 1.0)]
@@ -82,9 +81,11 @@ class TestEquityGroup(unittest.TestCase):
     def test_value_at_far_future(self):
         instance = EquityGroup(self.last_month + self.next_month + self.next_year)
         result = instance.value_at(date.today() + timedelta(weeks=100))
-        exp_result = self.last_month_value + self.next_month_value + self.next_year_value
+        exp_result = (
+            self.last_month_value + self.next_month_value + self.next_year_value
+        )
         self.assertEqual(result, exp_result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

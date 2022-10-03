@@ -25,6 +25,7 @@ from util import format_currency
 # Given a EquityGroup, bin the value by vesting month.
 # Put everything already vested in a single bin.
 
+
 class VestingSchedule:
     def __init__(self, equity_group, bin_size):
         self.equity_group = equity_group

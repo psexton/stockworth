@@ -25,18 +25,17 @@ from stockworth.threshold import Threshold
 
 
 class TestThreshold(unittest.TestCase):
-
     def setUp(self):
         today = date.today()
         self.last_month = [
             Equity(today - timedelta(days=40), 100.0),
             Equity(today - timedelta(days=42), 100.0),
-            Equity(today - timedelta(days=44), 100.0)
+            Equity(today - timedelta(days=44), 100.0),
         ]
         self.last_month_value = 300
         self.next_month = [
             Equity(today + timedelta(days=46), 10.0),
-            Equity(today + timedelta(days=48), 10.0)
+            Equity(today + timedelta(days=48), 10.0),
         ]
         self.next_month_value = 20
         self.next_year = [Equity(today + timedelta(days=365), 1.0)]
@@ -58,5 +57,5 @@ class TestThreshold(unittest.TestCase):
         self.assertEqual(result, exp_result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

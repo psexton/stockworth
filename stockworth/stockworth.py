@@ -56,10 +56,14 @@ def main():
     message_tax_suffix = "(post-tax)" if config["tax_rate"] > 0.0 else "(pre-tax)"
 
     # pretty print
-    message = f"{ticker_symbol} last closed at {latest_price:,.2f}. " \
-              f"At that price, your total equity is worth {format_currency(total_value)} {message_tax_suffix}." \
-              f"\nYour vesting schedule is"
-    for entry in VestingSchedule(all_equity, config["bin_size"]).compute_and_format_schedule():
+    message = (
+        f"{ticker_symbol} last closed at {latest_price:,.2f}. "
+        f"At that price, your total equity is worth {format_currency(total_value)} {message_tax_suffix}."
+        f"\nYour vesting schedule is"
+    )
+    for entry in VestingSchedule(
+        all_equity, config["bin_size"]
+    ).compute_and_format_schedule():
         message += f"\n\t{entry}"
     message += f"\nIf you quit today, you will be walking away from {format_currency(unvested_value)}."
     for threshold in thresholds:
@@ -72,17 +76,37 @@ def main():
 def read_config():
     # read in config file name
     parser = argparse.ArgumentParser(prog="stockworth.py")
-    parser.add_argument("-f", "--file", default="config.json",
-                        help="The json file to read the config from (defaults to config.json).")
-    parser.add_argument("-p", "--price", type=float, help="The price to use instead of the most recent closing price")
-    parser.add_argument("-i", "--interval", choices=tuple(t.name.lower() for t in Interval),
-                        default=Interval.YEARLY.name.lower(), help="The interval to use for vesting periods (defaults "
-                                                                   "to yearly)")
-    parser.add_argument("-t", "--tax", type=float, help="Tax rate. If provided, after-tax values will be shown.")
-    parser.add_argument("--rsu-only", action='store_true', default=False, help="Ignore NSOs")
+    parser.add_argument(
+        "-f",
+        "--file",
+        default="config.json",
+        help="The json file to read the config from (defaults to config.json).",
+    )
+    parser.add_argument(
+        "-p",
+        "--price",
+        type=float,
+        help="The price to use instead of the most recent closing price",
+    )
+    parser.add_argument(
+        "-i",
+        "--interval",
+        choices=tuple(t.name.lower() for t in Interval),
+        default=Interval.YEARLY.name.lower(),
+        help="The interval to use for vesting periods (defaults " "to yearly)",
+    )
+    parser.add_argument(
+        "-t",
+        "--tax",
+        type=float,
+        help="Tax rate. If provided, after-tax values will be shown.",
+    )
+    parser.add_argument(
+        "--rsu-only", action="store_true", default=False, help="Ignore NSOs"
+    )
     args = parser.parse_args()
 
-    with open(args.file, 'r') as config_file:
+    with open(args.file, "r") as config_file:
         config = json.loads(config_file.read())
 
     # If price was specified as an arg, copy it into the config
@@ -94,7 +118,9 @@ def read_config():
         if "apikey" not in config:
             env_api_key = os.getenv("ALPHAVANTAGE_API_KEY")
             if env_api_key is None:
-                raise Exception("Could not find api key, and price override was not specified")
+                raise Exception(
+                    "Could not find api key, and price override was not specified"
+                )
             else:
                 config["apikey"] = env_api_key
         config["price"] = get_latest_price(config["symbol"], config["apikey"])
@@ -127,27 +153,31 @@ def get_latest_price(ticker_symbol, api_key):
 
 def convert_to_equity(latest_price, config):
     # convert rsus into date/value pairs
-    rsus = list(map(
-        lambda rsu: Equity.from_rsu(
-            current_price=latest_price,
-            quantity=rsu["qty"],
-            vest_date=rsu["vest_date"],
-            tax_rate=config["tax_rate"]
-        ),
-        config["rsus"]
-    ))
+    rsus = list(
+        map(
+            lambda rsu: Equity.from_rsu(
+                current_price=latest_price,
+                quantity=rsu["qty"],
+                vest_date=rsu["vest_date"],
+                tax_rate=config["tax_rate"],
+            ),
+            config["rsus"],
+        )
+    )
 
     # convert options into date/value pairs
-    options = list(map(
-        lambda option: Equity.from_option(
-            current_price=latest_price,
-            quantity=option["qty"],
-            vest_date=option["vest_date"],
-            strike_price=option["price"],
-            tax_rate=config["tax_rate"]
-        ),
-        config["options"]
-    ))
+    options = list(
+        map(
+            lambda option: Equity.from_option(
+                current_price=latest_price,
+                quantity=option["qty"],
+                vest_date=option["vest_date"],
+                strike_price=option["price"],
+                tax_rate=config["tax_rate"],
+            ),
+            config["options"],
+        )
+    )
 
     equity_inputs_to_use = list()
     if config["use_rsus"]:

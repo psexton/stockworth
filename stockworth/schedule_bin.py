@@ -27,7 +27,7 @@ class ScheduleBin:
     Implements hashable and sortable.
     """
 
-    already_vested = date.fromisoformat('2000-01-01')  # flag date for "already vested"
+    already_vested = date.fromisoformat("2000-01-01")  # flag date for "already vested"
 
     def __init__(self, equity, interval):
         self.equity = equity
